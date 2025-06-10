@@ -1,6 +1,7 @@
 from window import Window
+from data import request_call
 
 def main():
-    win = Window()
+    request_call()
     
 main()
