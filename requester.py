@@ -3,18 +3,17 @@ import pprint as pp
 import json
 
 
-def request_call():
-
-    url = 'https://pokeapi.co/api/v2/pokemon/?limit=1025'
+def request_call(url=None): #call the pokemon API and request the data from the url provided
+    if not url:
+        raise Exception("No URL passed.")
+    
     response = requests.get(url)
 
-    if response.status_code == 200:
+    if response.status_code == 200: #check if request was succesful
         print("api request successful")
         data = response.json()
-        dex = data['results']
-        with open('data.json', 'w') as file:
-            print("dumping data into file")
-            json.dump(dex, file, indent= 4)
+
+        return data
 
     else:
         print(f"failed to retreive data: {response.status_code}")
