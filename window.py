@@ -1,7 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import *
-import time
+from requester import request_call
+import random
 from PIL import Image, ImageTk
 
 class Window:
@@ -19,11 +20,14 @@ class Window:
         self.correct = None
         self.total = 0
         self.curr = 1
+        self.content = None
+        self.pokemon = {}
         
         self.init_start()
         self.startframe.pack()
+        self.get_data()
         self.root.mainloop()
-    
+        
     def center_window(self, width, height): #makes sure window spawns at the same spot
         self.screen_width = self.root.winfo_screenwidth()
         self.screen_height = self.root.winfo_screenheight()
@@ -43,13 +47,14 @@ class Window:
         greetings = ttk.Label(self.startframe, text= "Welcome to the Pokémon Quiz!", font=('Arial', 36))
         start = ttk.Button(self.startframe, text="Start Quiz", command= lambda: self.start_quiz())
         quit = ttk.Button(self.startframe, text= "Quit", command= self.root.destroy)
-        description = ttk.Label(self.startframe, text= "In this 5 question quiz, you'll have to pick which attribute doesn't match up with the displayed pokemon!")
+        description = ttk.Label(self.startframe, text= "In this 5 question quiz, you'll have to pick which attribute matches up with the displayed pokemon!")
         greetings.grid(row= 0, column= 0)
         start.grid(row= 1, column= 0, pady= 50)
         quit.grid(row= 3, column= 0, pady= 50)
         description.grid(row= 2, column= 0)
 
-    def start_quiz(self):
+    def start_quiz(self): #begin the quiz
+
         self.startframe.destroy()
         self.init_quiz_frame()
 
@@ -128,3 +133,30 @@ class Window:
         self.curr = 1
         self.total = 0
         self.init_quiz_frame()
+
+    def get_data(self): #make request calls to the api to acquire the data that will be used
+        if not self.content: #populate the list with pokemon
+           dex = request_call(url='https://pokeapi.co/api/v2/pokemon?&limit=1025')
+           self.content= dex['results']
+           
+
+        #select 10 pokemon at random and grab their data
+        poke_list = []
+        i = 0
+        while i < 10:
+            mon = random.randrange(1, len(self.content))
+            poke_list.append(mon)
+            i += 1
+        print(poke_list)
+        
+        #grab the data for the 10 selected pokemon
+        for num in poke_list:
+            info = request_call(url=f'https://pokeapi.co/api/v2/pokemon/{num}')
+            self.pokemon[info['name']] = info
+        print(self.pokemon.keys())
+
+        
+
+
+
+        

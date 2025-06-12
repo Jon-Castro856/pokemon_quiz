@@ -1,7 +1,4 @@
 import requests
-import pprint as pp
-import json
-
 
 def request_call(url=None): #call the pokemon API and request the data from the url provided
     if not url:
