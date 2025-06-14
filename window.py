@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import *
-from requester import request_call
+from requester import request_call, image_request
 import random
 from PIL import Image, ImageTk
 
@@ -20,8 +20,9 @@ class Window:
         self.correct = None
         self.total = 0
         self.curr = 1
-        self.content = None
         self.pokemon = {}
+        self.image = None #image for the pokemon
+        self.name = None #name of the pokemon
         
         self.init_start()
         self.startframe.pack()
@@ -47,14 +48,14 @@ class Window:
         greetings = ttk.Label(self.startframe, text= "Welcome to the Pokémon Quiz!", font=('Arial', 36))
         start = ttk.Button(self.startframe, text="Start Quiz", command= lambda: self.start_quiz())
         quit = ttk.Button(self.startframe, text= "Quit", command= self.root.destroy)
-        description = ttk.Label(self.startframe, text= "In this 5 question quiz, you'll have to pick which attribute matches up with the displayed pokemon!")
+        description = ttk.Label(self.startframe, text= "In this 5 question quiz, you'll have to pick which attribute does not match up with the displayed pokemon!")
         greetings.grid(row= 0, column= 0)
         start.grid(row= 1, column= 0, pady= 50)
         quit.grid(row= 3, column= 0, pady= 50)
         description.grid(row= 2, column= 0)
 
     def start_quiz(self): #begin the quiz
-
+        self.grab_quiz_data(display=True)
         self.startframe.destroy()
         self.init_quiz_frame()
 
@@ -72,7 +73,8 @@ class Window:
         self.quiz_frame.pack()
         
         #initialize quiz content
-        picture = ttk.Label(self.quiz_frame, width= 48, text= "Image goes here")
+        picture = ttk.Label(self.quiz_frame, width= 48, image=self.image)
+        name = ttk.Label(self.quiz_frame, text= f"{self.name}")
         question = ttk.Label(self.quiz_frame, padding= 10, text= "Which of these is incorrect?")
         curr_question = ttk.Label(self.quiz_frame, text= f"Question #{self.curr}")
         answer_count = ttk.Label(self.quiz_frame, text= f"Correct answers: {self.total}")
@@ -84,13 +86,14 @@ class Window:
 
         #place content onto screen
         picture.grid(row= 0, column= 0)
-        question.grid(row= 1, column= 0)
+        name.grid(row= 1, column= 0)
+        question.grid(row= 2, column= 0)
         curr_question.grid(row= 0, column= 2)
-        answer_count.grid(row= 1, column= 2)
-        select1.grid(row= 2, column= 0, pady= 10)
-        select2.grid(row= 2, column= 1)
-        select3.grid(row= 3, column= 0, pady= 10)
-        select4.grid(row= 3, column= 1)
+        answer_count.grid(row= 2, column= 2)
+        select1.grid(row= 3, column= 0, pady= 10)
+        select2.grid(row= 3, column= 1)
+        select3.grid(row= 4, column= 0, pady= 10)
+        select4.grid(row= 4, column= 1)
 
     def check_answer(self, answer): #check if the answer is correct, and update the relevant variables
         if answer == self.correct:
@@ -135,19 +138,13 @@ class Window:
         self.init_quiz_frame()
 
     def get_data(self): #make request calls to the api to acquire the data that will be used
-        if not self.content: #populate the list with pokemon
-           dex = request_call(url='https://pokeapi.co/api/v2/pokemon?&limit=1025')
-           self.content= dex['results']
-           
-
         #select 10 pokemon at random and grab their data
         poke_list = []
         i = 0
         while i < 10:
-            mon = random.randrange(1, len(self.content))
+            mon = random.randrange(1, 1026) #range of the pokemon national dex
             poke_list.append(mon)
             i += 1
-        print(poke_list)
         
         #grab the data for the 10 selected pokemon
         for num in poke_list:
@@ -155,8 +152,7 @@ class Window:
             self.pokemon[info['name']] = info
         print(self.pokemon.keys())
 
-        
+    def grab_quiz_data(self, display=False): #grab the data to put into the quiz
+        picked = []
+        poke = random.choice(list(self.pokemon.keys())) #select a pokemon from the list
 
-
-
-        
