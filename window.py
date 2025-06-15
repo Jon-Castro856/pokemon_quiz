@@ -156,3 +156,4 @@ class Window:
         picked = []
         poke = random.choice(list(self.pokemon.keys())) #select a pokemon from the list
 
+#added a coimment
