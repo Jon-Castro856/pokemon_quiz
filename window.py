@@ -21,6 +21,7 @@ class Window:
         self.total = 0
         self.curr = 1
         self.pokemon = {}
+        self.picked = []
         self.image = None #image for the pokemon
         self.name = None #name of the pokemon
         
@@ -55,7 +56,7 @@ class Window:
         description.grid(row= 2, column= 0)
 
     def start_quiz(self): #begin the quiz
-        self.grab_quiz_data(display=True)
+        self.grab_quiz_data()
         self.startframe.destroy()
         self.init_quiz_frame()
 
@@ -79,10 +80,10 @@ class Window:
         curr_question = ttk.Label(self.quiz_frame, text= f"Question #{self.curr}")
         answer_count = ttk.Label(self.quiz_frame, text= f"Correct answers: {self.total}")
         
-        select1 = ttk.Button(self.quiz_frame, text= "aaa", command= lambda: self.check_answer(self.answer1))
-        select2 = ttk.Button(self.quiz_frame, text= "bbb", command= lambda: self.check_answer(self.answer2))
-        select3= ttk.Button(self.quiz_frame, text= "ccc", command= lambda: self.check_answer(self.answer3))
-        select4 = ttk.Button(self.quiz_frame, text= "ddd", command= lambda: self.check_answer(self.answer4))
+        select1 = ttk.Button(self.quiz_frame, text= f"{self.answer1}", command= lambda: self.check_answer(self.answer1))
+        select2 = ttk.Button(self.quiz_frame, text= f"{self.answer2}", command= lambda: self.check_answer(self.answer2))
+        select3= ttk.Button(self.quiz_frame, text= f"{self.answer3}", command= lambda: self.check_answer(self.answer3))
+        select4 = ttk.Button(self.quiz_frame, text= f"{self.answer4}", command= lambda: self.check_answer(self.answer4))
 
         #place content onto screen
         picture.grid(row= 0, column= 0)
@@ -152,8 +153,59 @@ class Window:
             self.pokemon[info['name']] = info
         print(self.pokemon.keys())
 
-    def grab_quiz_data(self, display=False): #grab the data to put into the quiz
-        picked = []
+    def grab_quiz_data(self): #grab the data to put into the quiz
         poke = random.choice(list(self.pokemon.keys())) #select a pokemon from the list
+        while poke in self.picked:
+            poke = random.choice(list(self.pokemon.keys()))
+        
+        self.picked.append(poke)
+        link = self.pokemon[poke]['sprites']['front_default']
+        tk_image = image_request(url=link)
+        poke_image = ImageTk.PhotoImage(Image.open(tk_image))
+        self.image = poke_image
+        self.name = self.pokemon[poke]['name'].capitalize()
 
-#added a coimment
+        #pick 3 things from the pokemon to populate the answers, then one decoy answer from a decoy pokemon
+        selection = ['abilities', 'types', 'moves']
+        
+        count = 0
+        answers = []
+        
+        while count < 3:
+            index = 0
+            choice = random.choice(selection)
+            if len(self.pokemon[poke][choice]) > 1:
+                index = random.randrange(0, len(choice)-1)
+
+            print(self.pokemon[poke][choice][1])
+            answer_string = f"{choice}: {self.pokemon[poke][choice][0]['name']}"
+            answers.append(answer_string)
+            count += 1
+        
+        decoy = random.choice(list(self.pokemon.keys()))
+        while decoy == poke:
+            decoy = random.choice(self.pokemon.keys())
+        
+        choice = random.choice(selection)
+        
+        decoy_answer = f"{choice}: {self.pokemon[decoy][choice][0]}"
+        answers.append(decoy_answer)
+        self.correct = decoy_answer
+
+        
+        choice = random.choice(answers)
+        self.answer1 = choice
+        answers.remove(choice)
+        choice = random.choice(answers)
+        self.answer2 = choice
+        answers.remove(choice)
+        choice = random.choice(answers)
+        self.answer3 = choice
+        answers.remove(choice)
+        choice = random.choice(answers)
+        self.answer4 = choice
+        answers.remove(choice)
+        
+            
+
+
