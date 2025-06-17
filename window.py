@@ -168,43 +168,9 @@ class Window:
         #pick 3 things from the pokemon to populate the answers, then one decoy answer from a decoy pokemon
         selection = ['abilities', 'types', 'moves']
         
-        count = 0
-        answers = []
+        #fucking hell
         
-        while count < 3:
-            index = 0
-            choice = random.choice(selection)
-            if len(self.pokemon[poke][choice]) > 1:
-                index = random.randrange(0, len(choice)-1)
 
-            print(self.pokemon[poke][choice][1])
-            answer_string = f"{choice}: {self.pokemon[poke][choice][0]['name']}"
-            answers.append(answer_string)
-            count += 1
-        
-        decoy = random.choice(list(self.pokemon.keys()))
-        while decoy == poke:
-            decoy = random.choice(self.pokemon.keys())
-        
-        choice = random.choice(selection)
-        
-        decoy_answer = f"{choice}: {self.pokemon[decoy][choice][0]}"
-        answers.append(decoy_answer)
-        self.correct = decoy_answer
-
-        
-        choice = random.choice(answers)
-        self.answer1 = choice
-        answers.remove(choice)
-        choice = random.choice(answers)
-        self.answer2 = choice
-        answers.remove(choice)
-        choice = random.choice(answers)
-        self.answer3 = choice
-        answers.remove(choice)
-        choice = random.choice(answers)
-        self.answer4 = choice
-        answers.remove(choice)
         
             
 
