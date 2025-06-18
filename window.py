@@ -122,6 +122,7 @@ class Window:
         if self.curr > 5:
             self.init_end_screen()
         else:
+            self.grab_quiz_data()
             self.init_quiz_frame()
 
     def init_end_screen(self): #show them how many questions they got right, and offer to replay quiz
@@ -136,6 +137,7 @@ class Window:
         frame.destroy()
         self.curr = 1
         self.total = 0
+        self.grab_quiz_data()
         self.init_quiz_frame()
 
     def get_data(self): #make request calls to the api to acquire the data that will be used
@@ -151,7 +153,6 @@ class Window:
         for num in poke_list:
             info = request_call(url=f'https://pokeapi.co/api/v2/pokemon/{num}')
             self.pokemon[info['name']] = info
-        print(self.pokemon.keys())
 
     def grab_quiz_data(self): #grab the data to put into the quiz
         poke = random.choice(list(self.pokemon.keys())) #select a pokemon from the list
@@ -166,12 +167,56 @@ class Window:
         self.name = self.pokemon[poke]['name'].capitalize()
 
         #pick 3 things from the pokemon to populate the answers, then one decoy answer from a decoy pokemon
+        answers = []
+
+        while len(answers) < 4:
+            answer = self.get_answer(poke)
+            while answer in answers and len(answer) >= 1:
+                answer = self.get_answer(poke)
+            answers.append(answer)
+                
+
+        decoy = random.choice(list(self.pokemon.keys()))
+        while decoy == poke:
+            decoy = random.choice(list(self.pokemon.keys()))
+        
+        decoy_answer = self.get_answer(decoy)
+        while decoy_answer in answers:
+            decoy_answer = self.get_answer(decoy)
+
+        self.correct =  decoy_answer
+        answers.append(decoy_answer)
+    
+        random.shuffle(answers)
+        self.answer1 = answers[0]
+        self.answer2 = answers[1]
+        self.answer3 = answers[2]
+        self.answer4 = answers[3]
+
+    def get_answer(self, poke):
         selection = ['abilities', 'types', 'moves']
-        
-        #fucking hell
-        
+        option = random.choice(selection)
+        if option == 'abilities':
+            index = 0
+            if len(self.pokemon[poke][option]) > 1:
+                index = random.randrange(0, len(self.pokemon[poke][option]))
 
+            name = self.pokemon[poke][option][index]['ability']['name'].capitalize()
+            return f"Ability: {name}"
         
-            
+        if option == 'moves':
+            index = 0
+            if len(self.pokemon[poke][option]) > 1:
+                index = random.randrange(0, len(self.pokemon[poke][option]))
 
+            name = self.pokemon[poke][option][index]['move']['name'].capitalize()
+            return f"Move: {name}"
 
+        if option == 'types':
+            index = 0
+            if len(self.pokemon[poke][option]) > 1:
+                index = random.randrange(0, len(self.pokemon[poke][option]))
+
+            name = self.pokemon[poke][option][index]['type']['name'].capitalize()
+            return f"Type: {name}"
+        
